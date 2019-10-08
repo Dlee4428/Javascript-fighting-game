@@ -1,0 +1,345 @@
+
+<html>
+<head>
+	<meta charset="utf-8">
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var canvas = $("#myCanvas");
+			var context = canvas.get(0).getContext("2d");
+
+			var kyo=
+			{
+				image: "kyo.png",
+				health: 100,
+				hitting: 0,
+				standing:	0,
+        jumping: 1,
+				punching: 2,
+				kicking:3,
+        crouching:4,
+				charging: 5,
+				posx:	200,
+				posy:	90,
+				state: 0
+			};
+
+			var kyo2 =
+			{
+				image: "kyoReverse.png",
+				health: 100,
+				hitting: 0,
+        standing:	0,
+        jumping: 1,
+				punching: 2,
+				kicking:3,
+        crouching:4,
+				charging: 5,
+				posx:	450,
+				posy:	90,
+				state: 0
+			};
+
+			var healthkyo = new Image();
+				healthkyo.src = "healthbar.png";
+				healthkyo.addEventListener("load",render,false);
+
+			var healthkyo2 = new Image();
+				healthkyo2.src = "healthbar.png";
+				healthkyo2.addEventListener("load",render,false);
+
+			var background = new Image();
+			background.src = "world.png";
+			background.onload = function(){
+				context.drawImage(background,0,0);
+				};
+
+			var kyoImage = new Image();
+			kyoImage.addEventListener("load", render, false);
+			kyoImage.src = kyo.image;
+
+			var kyo2Image = new Image();
+			kyo2Image.addEventListener("load", render, false);
+			kyo2Image.src = kyo2.image;
+
+			window.addEventListener("keydown", keydownHandler, false);
+			window.addEventListener("keyup",keyupHandler,false);
+
+			function keyupHandler() {
+			  context.clearRect(0,0,750,240);
+				kyo.state = kyo.standing;
+				kyo2.state = kyo2.standing;
+				context.drawImage(background,0,0);
+				render();
+			}
+
+			function hitDetection1(){
+
+					if(kyo.hitting == 3){
+					kyo.health += 10
+					if(kyo.health > 100){
+					kyo.health = 100;
+					}
+					}
+				if(kyo2.posx - kyo.posx <= 40)
+				{
+					if(kyo.hitting == 1){
+					kyo2.health= kyo2.health -= 10;
+					}
+					else if(kyo.hitting == 2){
+					kyo2.health -= 20;
+					}
+
+				}
+				if(kyo2.health <= 0){
+				alert("player1 won");
+				kyo2.posx = 400;
+				kyo2.health = 100
+				kyo.posx = 0;
+				kyo.health = 100;
+				kyo.state = kyo.standing;
+				kyo2.state = kyo2.standing;
+				render();
+
+				}
+				kyo.hitting = 0;
+			}
+
+
+			function hitDetection2(){
+			if(kyo2.hitting == 3){
+					kyo2.health += 10
+					if(kyo2.health > 100){
+					kyo2.health = 100;
+
+					}
+				}
+			if(kyo2.posx - kyo.posx <= 40)
+				{
+					if(kyo2.hitting == 1){
+					kyo.health = kyo.health -= 10;
+					}
+					else if(kyo2.hitting ==2){
+					kyo.health = kyo.health - 20;
+					}
+
+				}
+				if(kyo.health <= 0){
+				alert("player2 won");
+				kyo2.posx = 400;
+				kyo2.health= 100
+				kyo.posx = 0;
+				kyo.health = 100;
+				kyo.state = kyo.standing;
+				kyo2.state = kyo2.standing;
+				render();
+				}
+				kyo2.hitting = 0;
+			}
+
+
+
+			function keydownHandler(event) {
+
+                switch (event.keyCode) {
+                case 90: kyo.state = kyo.punching;
+					      kyo.hitting = 1;
+								hitDetection1();
+                    break;
+                case 88: kyo.state = kyo.kicking;
+								kyo.hitting = 2;
+								hitDetection1();
+                    break;
+                case 67: kyo.state = kyo.charging;
+								kyo.hitting = 3;
+								hitDetection1();
+                    break;
+					      case 68:	//right
+								kyo.posx += 10;
+								if(kyo.posx >= 650){
+								kyo.posx = 650;
+								}
+								render();
+								break;
+					      case 65:	//left
+								kyo.posx -= 10;
+								if(kyo.posx <= 0 ){
+								kyo.posx = 0;
+								}
+                render();
+								break;
+					      case 87:	//upw
+								kyo.state = kyo.jumping;
+								break;
+				      	case 83:	//down
+								kyo.state = kyo.crouching;
+                break;
+
+
+				      	//goku2
+                case 80: kyo2.state = kyo2.punching;
+								kyo2.hitting = 1;
+								hitDetection2();
+                break;
+                case 79: kyo2.state = kyo2.kicking;
+								kyo2.hitting = 2;
+								hitDetection2();
+                break;
+                case 73: kyo2.state = kyo2.charging;
+								kyo2.hitting = 3;
+                hitDetection2();
+								break;
+					      case 39:	//right
+								kyo2.posx+=10;
+								if(kyo2.posx >= 650){
+								kyo2.posx = 650;
+								}
+								render();
+								break;
+					      case 37:	//left
+								kyo2.posx-=10;
+								if(kyo2.posx <=0 ){
+								kyo2.posx= 0;
+								}
+								render();
+								break;
+					      case 38:	//up
+								kyo2.state = kyo2.jumping;
+								break;
+				       	case 40:	//down
+								kyo2.state = kyo2.crouching;
+                break;
+                default:	kyo.state = kyo.standing;
+								kyo2.state = kyo2.standing;
+                break;
+                }
+
+				context.clearRect(0,0,750,240);
+				context.drawImage(background,0,0);
+				render();
+			}
+
+			function render() {
+			//health bars
+			if(kyo.health>90)
+			{context.drawImage(healthkyo,0, 20, 275, 25, 10,10,270,15);}
+			else if(kyo.health==90)
+			{context.drawImage(healthkyo,0, 45, 275, 25, 10,10,270,15);}
+			else if(kyo.health==80)
+			{context.drawImage(healthkyo,0, 73, 275, 25, 10,10,270,15);}
+			else if(kyo.health==70)
+			{context.drawImage(healthkyo,0, 103, 275, 25, 10,10,270,15);}
+			else if(kyo.health==60)
+			{context.drawImage(healthkyo,0, 136, 275, 25, 10,10,270,15);}
+			else if(kyo.health==50)
+			{context.drawImage(healthkyo,0, 169, 275, 25, 10,10,270,15);}
+			else if(kyo.health==40)
+			{context.drawImage(healthkyo,0, 196, 275, 25, 10,10,270,15);}
+			else if(kyo.health==30)
+			{context.drawImage(healthkyo,0, 227, 275, 25, 10,10,270,15);}
+			else if(kyo.health==20)
+			{context.drawImage(healthkyo,0, 260, 275, 25, 10,10,270,15);}
+			else if(kyo.health==10)
+			{context.drawImage(healthkyo,0, 297, 275, 25, 10,10,270,15);}
+			else if(kyo.health==0)
+			{context.drawImage(healthkyo,0, 321, 275, 25, 10,10,270,15);}
+
+
+
+			if(kyo2.health>90)
+			{context.drawImage(healthkyo2,0, 20, 275, 25, 480,10,270,15);}
+			else if(kyo2.health==90)
+			{context.drawImage(healthkyo2,0, 45, 275, 25, 480,10,270,15);}
+			else if(kyo2.health==80)
+			{context.drawImage(healthkyo2,0, 73, 275, 25, 480,10,270,15);}
+			else if(kyo2.health==70)
+			{context.drawImage(healthkyo2,0, 103, 275, 25, 480,10,270,15);}
+			else if(kyo2.health==60)
+			{context.drawImage(healthkyo2,0, 136, 275, 25, 480,10,270,15);}
+			else if(kyo2.health==50)
+			{context.drawImage(healthkyo2,0, 169, 275, 25, 480,10,270,15);}
+			else if(kyo2.health==40)
+			{context.drawImage(healthkyo2,0, 196, 275, 25, 480,10,270,15);}
+			else if(kyo2.health==30)
+			{context.drawImage(healthkyo2,0, 227, 275, 25, 480,10,270,15);}
+			else if(kyo2.health==20)
+			{context.drawImage(healthkyo2,0, 260, 275, 25, 480,10,270,15);}
+			else if(kyo2.health==10)
+			{context.drawImage(healthkyo2,0, 297, 275, 25, 480,10,270,15);}
+			else if(kyo2.health<=0)
+			{context.drawImage(healthkyo2,0, 321, 275, 25, 480,10,270,15);}
+			//goku positions and states
+				switch(kyo.state) {
+					case kyo.standing: context.drawImage(kyoImage,0, 0, 110, 200,kyo.posx, kyo.posy, 110, 200 );
+											break;
+					case kyo.crouching: context.drawImage
+											(kyoImage,
+											500, 0, 110, 200,
+											kyo.posx, kyo.posy, 110, 200 );
+											break;
+					case kyo.jumping: context.drawImage
+											(kyoImage,
+											95, 0, 110, 200,
+											kyo.posx, kyo.posy, 110, 200 );
+											break;
+					case kyo.punching: context.drawImage
+											(kyoImage,
+											220, 0, 110, 200,
+											kyo.posx, kyo.posy, 110, 200 );
+											break;
+					case kyo.kicking: context.drawImage
+											(kyoImage,
+											368, 0, 110, 200,
+											kyo.posx, kyo.posy, 110, 200 );
+											break;
+					case kyo.charging: 	context.drawImage
+											(kyoImage,
+											620, 0, 110, 200,
+											kyo.posx, kyo.posy, 110, 200 );
+											break;
+					}
+				switch(kyo2.state) {
+					case kyo2.standing: context.drawImage(kyo2Image, 0, 0, 110, 200, kyo2.posx, kyo2.posy, 110, 200 );
+											break;
+					case kyo2.crouching: context.drawImage
+											(kyo2Image,
+											500, 0, 110, 200,
+											kyo2.posx, kyo2.posy, 110, 200 );
+											break;
+					case kyo2.jumping: 	context.drawImage
+											(kyo2Image,
+											95, 0, 110, 200,
+											kyo2.posx, kyo2.posy, 110, 200 );
+											break;
+					case kyo2.punching: context.drawImage
+											(kyo2Image,
+											220, 0, 110, 200,
+											kyo2.posx, kyo2.posy, 110, 200 );
+											break;
+					case kyo2.kicking: 	context.drawImage
+											(kyo2Image,
+											368, 0, 110, 200,
+											kyo2.posx, kyo2.posy, 110, 200 );
+											break;
+					case kyo2.charging: context.drawImage
+											(kyoImage,
+											620, 0, 110, 200,
+											kyo2.posx, kyo2.posy, 110, 200 );
+											break;
+					}
+			}
+		});
+	</script>
+</head>
+<body>
+	<canvas id="myCanvas" height="500" width="800"></canvas>
+  <p>Press Any Key To Start</p>
+  <p>Player1  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Player2</p>
+  <p>Z&nbsp;-Punch &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;P&nbsp;-Punch</p>
+  <p>X&nbsp;-Kick &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;O&nbsp;-Kick</p>
+  <p>C&nbsp;-Special &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;U&nbsp;-Special</p>
+  <audio autoplay loop>
+    <source src="Kof_esaka_forever.mp3" type="audio/mpeg">
+  </audio>
+</body>
+</html>
